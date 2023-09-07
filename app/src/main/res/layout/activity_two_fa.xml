@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TwoFaActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingStart="15dp"
+        android:layout_marginTop="9dp"
+        android:paddingEnd="15dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/numText"
+            android:layout_width="match_parent"
+            android:letterSpacing="0.09"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:layout_height="wrap_content"
+            android:text="000000" />
+
+        <TextView
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/numTextBinary"
+            android:layout_width="match_parent"
+            android:letterSpacing="0.09"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:layout_height="wrap_content"
+            android:text="000000" />
+
+        <LinearLayout
+            android:gravity="end"
+            android:layout_marginTop="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_margin="15dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_refresh_24"
+                android:id="@+id/refreshFab"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:src="@drawable/baseline_volume_up_24"
+                android:id="@+id/soundFab"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

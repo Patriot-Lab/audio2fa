@@ -17,8 +17,10 @@ import android.widget.EditText;
 
 public class MainActivity2 extends AppCompatActivity {
 
-    private double mInterval = 0.05;
+    private double mInterval = 0.01;
     private int mSampleRate = 44100;
+
+    private int byteDelay = 10;
     private byte[] generatedSnd;
 
     private final double mStandardFreq = 2000;
@@ -66,11 +68,12 @@ public class MainActivity2 extends AppCompatActivity {
         String[] bits = new String[c.length];
         for(int i = 0 ; i < c.length ; i++){
             bits[i] = Integer.toBinaryString(c[i]);
+
+            Log.d(TAG, "getBinary: "+c[i]+" "+(int)c[i] +" " +bits[i]);
         }
         StringBuilder ds = new StringBuilder();
         for(String st: bits){
 
-            Log.d(TAG, "getBinary: "+ st);
             ds.append(st);
         }
         Log.d(TAG, "getBinary: "+ ds);
@@ -88,7 +91,7 @@ public class MainActivity2 extends AppCompatActivity {
                 byte[] tempByte = new byte[0];
                 for (int i = 0; i < 36 ; i++ ){
                     double note = getNoteFrequencies(i);
-                    byte[] tonByteNote = getTone(mInterval, mSampleRate, i%2==0?9000:0);
+                    byte[] tonByteNote = getTone(mInterval, mSampleRate, i%2==0?9000:4500);
                     tempByte = concat(tonByteNote, tempByte);
                 }
                 generatedSnd = tempByte;
@@ -119,6 +122,7 @@ public class MainActivity2 extends AppCompatActivity {
     private byte[] getTone(double duration, int rate, double frequencies){
 
         int maxLength = (int)(duration * rate);
+        Log.d(TAG, "getTone: "+maxLength);
         byte generatedTone[] = new byte[2 * maxLength];
 
         double[] sample = new double[maxLength];
