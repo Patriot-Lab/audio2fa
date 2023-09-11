@@ -141,7 +141,11 @@ public class TwoFaActivity extends AppCompatActivity {
     }
 
     private double sine(int x, double frequencies){
-        return Math.sin(  2*Math.PI * x * frequencies);
+        double sineValue = Math.sin(  2*Math.PI * x * frequencies);
+
+        //convert sine to square
+        return sineValue >= 0 ? 1.0 : -1.0;
+
     }
 
     void playTrack(byte[] generatedSnd){
