@@ -2,11 +2,13 @@ package com.example.audio2fa;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,11 +32,27 @@ public class ToneGenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tone_gen);
 
-        executorService.execute(() -> playSoundNew("123456789".getBytes()));
+        generateSnd("123456789");
+
+        int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+
+
+        executorService.execute(()->{
+
+            while(true)
+            {
+                playTrack();
+            }
+
+
+        });
     }
 
+    private void generateSnd(String data) {
 
-    void playSoundNew(byte[] dataArr) {
+        byte[] dataArr = data.getBytes();
+
 
         byte[] tempByte = new byte[0];
 
@@ -69,9 +87,6 @@ public class ToneGenActivity extends AppCompatActivity {
 
         generatedSnd = tempByte;
 
-        playTrack(generatedSnd);
-
-        playSoundNew("123456789".getBytes());
     }
 
     public int getBit(byte myByte, int position) {
@@ -114,17 +129,6 @@ public class ToneGenActivity extends AppCompatActivity {
         return generatedTone;
     }
 
-    private AudioTrack getAudioTrack(int length) {
-
-
-        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                sampleRate, AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, length,
-                AudioTrack.MODE_STATIC);
-
-        return audioTrack;
-    }
-
     private double sine(int x, double frequencies) {
         double sineValue = Math.sin(2 * Math.PI * x * frequencies);
 
@@ -133,10 +137,11 @@ public class ToneGenActivity extends AppCompatActivity {
 
     }
 
-    void playTrack(byte[] generatedSnd) {
-        getAudioTrack(generatedSnd.length)
-                .write(generatedSnd, 0, generatedSnd.length);
+    void playTrack() {
+
         audioTrack.play();
+        audioTrack.write(generatedSnd, 0, generatedSnd.length);
+
 
     }
 }
