@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ToneGenActivity extends AppCompatActivity {
 
-    private Handler handler = new Handler();
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private final int frequency = 9500;
 
@@ -27,64 +30,73 @@ public class ToneGenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tone_gen);
 
-        handler.post(() -> playSoundNew("123456789".getBytes()));
+        executorService.execute(() -> playSoundNew("123456789".getBytes()));
     }
 
 
-    void playSoundNew(byte[] dataArr){
+    void playSoundNew(byte[] dataArr) {
 
         byte[] tempByte = new byte[0];
 
-        for(byte dataItem: dataArr){
+        for (byte dataItem : dataArr) {
 
-            for (int i = 7 ; i >=0 ; i--){
+            double bitDuration;
+            byte[] byteNote;
+
+            bitDuration = 0.01;
+            byteNote = getTone(bitDuration, sampleRate, 0);
+            tempByte = concat(byteNote, tempByte);
+
+            for (int i = 7; i >= 0; i--) {
 
                 int bit = getBit(dataItem, i);
-                double bitDuration;
 
-                if(bit==1){
-                    bitDuration = 2;
-                }else{
-                    bitDuration = 4;
+                if (bit == 1) {
+                    bitDuration = 0.002;
+                } else {
+                    bitDuration = 0.004;
                 }
 
-                byte[] byteNote = getTone(bitDuration, sampleRate, frequency);
+                byteNote = getTone(bitDuration, sampleRate, frequency);
                 tempByte = concat(byteNote, tempByte);
 
-                bitDuration = 11;
+                bitDuration = 0.011;
                 byteNote = getTone(bitDuration, sampleRate, 0);
                 tempByte = concat(byteNote, tempByte);
 
             }
         }
+
         generatedSnd = tempByte;
 
         playTrack(generatedSnd);
+
+        playSoundNew("123456789".getBytes());
     }
 
-    public int getBit(byte myByte, int position){
+    public int getBit(byte myByte, int position) {
         return (myByte >> position) & 0x01;
     }
 
     public byte[] concat(byte[] a, byte[] b) {
         int aLen = a.length;
         int bLen = b.length;
-        byte[] c= new byte[aLen+bLen];
+        byte[] c = new byte[aLen + bLen];
         System.arraycopy(a, 0, c, 0, aLen);
         System.arraycopy(b, 0, c, aLen, bLen);
         return c;
     }
 
-    private byte[] getTone(double duration, int rate, double frequencies){
+    private byte[] getTone(double duration, int rate, double frequencies) {
 
-        int maxLength = (int)(duration * rate);
-        Log.d(TAG, "getTone: "+maxLength);
+        int maxLength = (int) (duration * rate);
+        Log.d(TAG, "getTone: " + maxLength);
         byte[] generatedTone = new byte[2 * maxLength];
 
         double[] sample = new double[maxLength];
         int idx = 0;
 
-        for (int x = 0; x < maxLength; x++){
+        for (int x = 0; x < maxLength; x++) {
             sample[x] = sine(x, frequencies / rate);
         }
 
@@ -102,7 +114,7 @@ public class ToneGenActivity extends AppCompatActivity {
         return generatedTone;
     }
 
-    private AudioTrack getAudioTrack(int length){
+    private AudioTrack getAudioTrack(int length) {
 
 
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
@@ -113,15 +125,15 @@ public class ToneGenActivity extends AppCompatActivity {
         return audioTrack;
     }
 
-    private double sine(int x, double frequencies){
-        double sineValue = Math.sin(  2*Math.PI * x * frequencies);
+    private double sine(int x, double frequencies) {
+        double sineValue = Math.sin(2 * Math.PI * x * frequencies);
 
         //convert sine to square
         return sineValue >= 0 ? 1.0 : -1.0;
 
     }
 
-    void playTrack(byte[] generatedSnd){
+    void playTrack(byte[] generatedSnd) {
         getAudioTrack(generatedSnd.length)
                 .write(generatedSnd, 0, generatedSnd.length);
         audioTrack.play();
